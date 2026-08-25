@@ -17,16 +17,15 @@ spec:
         - name: mlflow
           image: ghcr.io/mlflow/mlflow:v2.15.1
           command:
-            - mlflow
-            - server
-            - --host
-            - "0.0.0.0"
-            - --port
-            - "5000"
-            - --backend-store-uri
-            - "postgresql://mlflow:mlflowpassword@postgres.mlflow.svc.cluster.local:5432/mlflow"
-            - --default-artifact-root
-            - "s3://mlflow-artifacts"
+            - /bin/sh
+            - -c
+            - |
+              pip install --no-cache-dir psycopg2-binary boto3 cryptography && \
+              mlflow server \
+                --host 0.0.0.0 \
+                --port 5000 \
+                --backend-store-uri postgresql://mlflow:mlflowpassword@postgres.mlflow.svc.cluster.local:5432/mlflow \
+                --default-artifact-root s3://mlflow-artifacts
           env:
             - name: MLFLOW_S3_ENDPOINT_URL
               value: "http://minio.mlflow.svc.cluster.local:9000"
